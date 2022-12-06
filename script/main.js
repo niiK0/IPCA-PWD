@@ -3,11 +3,11 @@ const canvas = /** @type {HTMLCanvasElement} */ (
 );
 const c = canvas.getContext("2d");
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
 const bg_image = new Image();
 bg_image.src = "./img/background.jpg";
+
+canvas.width = bg_image.width;
+canvas.height = innerHeight;
 
 class Player {
   constructor() {
@@ -33,9 +33,6 @@ class Player {
   }
 
   draw() {
-    //Background
-    c.drawImage(bg_image, 0, 0, canvas.width, canvas.height);
-
     //Save canvas for rotation
     c.save();
     c.translate(
@@ -49,7 +46,6 @@ class Player {
       -player.position.y - player.height / 2
     );
 
-    //Player
     c.drawImage(
       this.image,
       this.position.x,
@@ -103,10 +99,56 @@ class Projectile {
   }
 }
 
+class Enemy {
+  constructor() {
+    this.velocity = {
+      x: 0,
+      y: 0,
+    };
+
+    const image = new Image();
+    image.src = "./img/enemy.png";
+    image.onload = () => {
+      const scale = 0.5;
+      this.image = image;
+      this.height = image.height * scale;
+      this.width = image.width * scale;
+      this.position = {
+        x: canvas.width / 2 - this.width / 2,
+        y: this.width,
+      };
+    };
+  }
+
+  draw() {
+    c.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+
+  update() {
+    if (this.image) {
+      this.draw();
+      this.position.x += this.velocity.x
+      this.position.y += this.velocity.y
+
+
+    }
+  }
+}
+
 const player = new Player();
-var player_shoot_interval = 100
+const enemies = [new Enemy()];
+const enemy = new Enemy()
+var player_shoot_interval = 500
+var enemy_shoot_interval = 500
 
 const projectiles = [];
+const enemy_projectiles = [];
 
 const keys = {
   a: {
@@ -123,7 +165,19 @@ const keys = {
 
 function animate() {
   requestAnimationFrame(animate);
+  
+  //Background
+  c.drawImage(bg_image, 0, 0, canvas.width, canvas.height);
+  //black bg to fade
+  c.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  
+  //draw the "rain" for stars effect
+  rain_draw()
+
   player.update();
+  enemy.update();
+
   projectiles.forEach((projectile, index) => {
     if(projectile.position.y + projectile.height <= 0){
         setTimeout(() =>{
@@ -133,6 +187,17 @@ function animate() {
         projectile.update();
     }
   });
+
+  enemy_projectiles.forEach((projectile, index) => {
+    if(projectile.position.y + projectile.height >= canvas.height){
+        setTimeout(() =>{
+          enemy_projectiles.splice(index, 1)
+        }, 0)
+    }else{
+        projectile.update();
+    }
+  });
+
 
   if (keys.a.pressed && player.position.x >= 10) {
     player.velocity.x = -7;
@@ -154,7 +219,7 @@ function animate() {
         projectiles.push(new Projectile({
             position: {
                 x: player.position.x + player.width / 7,
-                y: player.position.y - 10
+                y: player.position.y + player.height
             },
             velocity: -10
         }))
@@ -163,13 +228,27 @@ function animate() {
 }
 
 function shotCooldown(){
-    setInterval(() => {
-        if(!keys.space.can_shoot){
-            keys.space.can_shoot = true
-        }
-      }, player_shoot_interval)
+  setInterval(() => {
+      if(!keys.space.can_shoot){
+          keys.space.can_shoot = true
+      }
+    }, player_shoot_interval)
 }
 
+function enemyShotCooldown(){
+  setInterval(() => {
+    enemies.forEach((enemy) =>{
+      enemy_projectiles.push(new Projectile({
+        position: {
+            x: enemy.position.x + enemy.width / 7,
+            y: enemy.position.y - 10
+        },
+        velocity: 10
+      }))
+    })
+    }, enemy_shoot_interval)
+}
+enemyShotCooldown()
 shotCooldown()
 
 addEventListener("keydown", ({ key }) => {
@@ -201,3 +280,6 @@ addEventListener("keyup", ({ key }) => {
 });
 
 animate();
+
+//Raindrop
+rain_setup();
