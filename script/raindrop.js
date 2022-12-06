@@ -34,7 +34,7 @@ function rain_draw() {
     this.show = function() {
       var thick = map(this.z, 0, 20, 1, 3);
       c.lineWidth = thick;
-      c.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      c.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       c.beginPath();
       c.moveTo(this.x, this.y);
       c.lineTo(this.x, this.y + this.len);

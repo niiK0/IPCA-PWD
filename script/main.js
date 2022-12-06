@@ -7,6 +7,7 @@ const bg_image = new Image();
 bg_image.src = "./img/background.jpg";
 
 canvas.width = bg_image.width;
+// canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 class Player {
@@ -109,7 +110,7 @@ class Enemy {
     const image = new Image();
     image.src = "./img/enemy.png";
     image.onload = () => {
-      const scale = 0.5;
+      const scale = 0.25;
       this.image = image;
       this.height = image.height * scale;
       this.width = image.width * scale;
@@ -168,8 +169,9 @@ function animate() {
   
   //Background
   c.drawImage(bg_image, 0, 0, canvas.width, canvas.height);
+
   //black bg to fade
-  c.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  c.fillStyle = 'rgba(0, 0, 0, 0.8)';
   c.fillRect(0, 0, canvas.width, canvas.height);
   
   //draw the "rain" for stars effect
@@ -197,7 +199,6 @@ function animate() {
         projectile.update();
     }
   });
-
 
   if (keys.a.pressed && player.position.x >= 10) {
     player.velocity.x = -7;
