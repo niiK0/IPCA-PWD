@@ -9,6 +9,15 @@ const c = canvas.getContext("2d");
 const bg_image = new Image();
 bg_image.src = "./img/background.jpg";
 
+const enemy_image = new Image()
+enemy_image.src = "./img/enemy.png"
+
+const enemy_projectile_image = new Image()
+enemy_projectile_image.src = "./img/laser2.png"
+
+const player_projectile_image = new Image()
+player_projectile_image.src = "./img/laser.png"
+
 canvas.width = bg_image.width;
 // canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -73,16 +82,16 @@ class Player {
 
 class Projectile {
   constructor({ position, velocity }) {
-    const image = new Image();
-    image.src = "./img/laser.png";
-    image.onload = () => {
+    // const image = new Image();
+    // image.src = "./img/laser.png";
+    // image.onload = () => {
       const scale = 0.4;
-      this.image = image;
+      this.image = player_projectile_image;
       this.position = position;
       this.velocity = velocity;
-      this.width = image.width * scale;
-      this.height = image.height * scale;
-    };
+      this.width = this.image.width * scale;
+      this.height = this.image.height * scale;
+    // };
   }
 
   draw() {
@@ -106,16 +115,16 @@ class Projectile {
 
 class EnemyProjectile {
   constructor({ position, velocity }) {
-    const image = new Image();
-    image.src = "./img/laser2.png";
-    image.onload = () => {
+    // const image = new Image();
+    // image.src = "./img/laser2.png";
+    // image.onload = () => {
       const scale = 0.4;
-      this.image = image;
+      this.image = enemy_projectile_image;
       this.position = position;
       this.velocity = velocity;
-      this.width = image.width * scale;
-      this.height = image.height * scale;
-    };
+      this.width = this.image.width * scale;
+      this.height = this.image.height * scale;
+    // };
   }
 
   draw() {
@@ -139,18 +148,18 @@ class EnemyProjectile {
 
 class Enemy {
   constructor({position}) {
-    const image = new Image();
-    image.src = "./img/enemy.png";
-    image.onload = () => {
+    // const image = new Image();
+    // image.src = "./img/enemy.png";
+    // image.onload = () => {
       const scale = 1;
-      this.image = image;
-      this.height = image.height * scale;
-      this.width = image.width * scale;
+      this.image = enemy_image;
+      this.height = this.image.height * scale;
+      this.width = this.image.width * scale;
       this.position = {
         x: position.x,
         y: position.y,
       };
-    };
+    // };
   }
 
   draw() {
