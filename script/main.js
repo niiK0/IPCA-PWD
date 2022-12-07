@@ -266,6 +266,7 @@ let enemy_fake_height = 28
 
 const enemy_projectiles = [];
 
+let debug = true
 
 function animate() {
   requestAnimationFrame(animate);
@@ -277,6 +278,7 @@ function animate() {
   c.fillStyle = "rgba(0, 0, 0, 0.8)";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
+  
   //draw the "rain" for stars effect
   rain_draw();
   
@@ -285,7 +287,7 @@ function animate() {
       particle.position.x = Math.random() * canvas.width; //random
       particle.position.y = -particle.radius;
     }
-
+    
     if (particle.opacity <= 0) {
       setTimeout(() => {
         particles.splice(i, 1);
@@ -294,37 +296,8 @@ function animate() {
       particle.update();
     }
   });
-
-  //#region KEYS MOVE/SHOOT
-    if (keys.a.pressed && player.position.x >= 10) {
-      player.velocity.x = -7;
-      player.rotation = -0.15;
-    } else if (
-      keys.d.pressed &&
-      player.position.x + player.width <= canvas.width - 10
-    ) {
-      player.velocity.x = 7;
-      player.rotation = 0.15;
-    } else {
-      player.velocity.x = 0;
-      player.rotation = 0;
-    }
   
-    if (keys.space.pressed) {
-      if (keys.space.can_shoot) {
-        keys.space.can_shoot = false;
-        projectiles.push(
-          new Projectile({
-            position: {
-              x: player.position.x + player.width / 2 - 3, //3 pixels to adjust the position
-              y: player.position.y,
-            },
-            velocity: -10,
-          })
-        );
-      }
-    }
-    //#endregion
+  player.update();
 
   projectiles.forEach((projectile, index) => {
     if (projectile.position.y + projectile.height <= 0) {
@@ -338,23 +311,23 @@ function animate() {
       projectile.update();
     }
   });
-
-  enemy_projectiles.forEach((projectile, index) => {
-    if (projectile.position.y + projectile.height >= canvas.height) {
+  
+  enemy_projectiles.forEach((enemy_projectile, enemy_projectile_index) => {
+    if (enemy_projectile.position.y + enemy_projectile.height >= canvas.height) {
       setTimeout(() => {
-        const projectile_found = enemy_projectiles.find(projectile2 => projectile2 === projectile)
-        if(projectile_found){
-          enemy_projectiles.splice(index, 1);
+        const enemy_projectile_found = enemy_projectiles.find(enemy_projectile2 => enemy_projectile2 === enemy_projectile)
+        if(enemy_projectile_found){
+          enemy_projectiles.splice(enemy_projectile_index, 1);
         }
       }, 0);
     } else {
-      projectile.update();
+      enemy_projectile.update();
     }
 
-    //PLAYER COLLISION
-    if(projectile.position.y + projectile.height >= player.position.y
-      && projectile.position.x + projectile.width >= player.position.x
-      && projectile.position.x <= player.position.x + player.width
+    // //PLAYER COLLISION
+    if(enemy_projectile.position.y + enemy_projectile.height >= player.position.y
+      && enemy_projectile.position.x + enemy_projectile.width >= player.position.x
+      && enemy_projectile.position.x <= player.position.x + player.width
       ){
       //TAKE PLAYER LIVES
       console.log("you died")
@@ -408,8 +381,6 @@ function animate() {
     grid_frames = 0
   }
 
-  player.update();
-
   //FUN GLITCH LOL
   // enemy_projectiles.forEach((projectile, index) => {
   //   if (projectile.position.y + projectile.height >= canvas.height) {
@@ -420,6 +391,37 @@ function animate() {
   //     projectile.update();
   //   }
   // });
+
+  //#region KEYS MOVE/SHOOT
+  if (keys.a.pressed && player.position.x >= 10) {
+    player.velocity.x = -7;
+    player.rotation = -0.15;
+  } else if (
+    keys.d.pressed &&
+    player.position.x + player.width <= canvas.width - 10
+  ) {
+    player.velocity.x = 7;
+    player.rotation = 0.15;
+  } else {
+    player.velocity.x = 0;
+    player.rotation = 0;
+  }
+
+  if (keys.space.pressed) {
+    if (keys.space.can_shoot) {
+      keys.space.can_shoot = false;
+      projectiles.push(
+        new Projectile({
+          position: {
+            x: player.position.x + player.width / 2 - 3, //3 pixels to adjust the position
+            y: player.position.y,
+          },
+          velocity: -10,
+        })
+      );
+    }
+  }
+  //#endregion
 
   //#region PLAYER SHOOTING COOLDOWN
   if (player_shoot_frames % player_shoot_interval === 0) {

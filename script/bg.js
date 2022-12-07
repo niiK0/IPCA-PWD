@@ -6,7 +6,7 @@ const star_colors = ['white', 'yellow', 'orange']
 //#region ParticleJS
 particlesJS("particles-js", {
   particles: {
-    number: { value: 160, density: { enable: true, value_area: 500 } },
+    number: { value: 100, density: { enable: false, value_area: 500 } },
     shape: {type: "star"}, //cirlce maybe?
     color: { value: ["#fff", "#FFA500", "#FFFF00"] },
     opacity: {
