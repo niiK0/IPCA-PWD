@@ -46,7 +46,6 @@ particlesJS("particles-js", {
   },
   retina_detect: true
 });
-
 //#endregion
 
 class Particle{

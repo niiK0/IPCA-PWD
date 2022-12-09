@@ -1,3 +1,8 @@
+@font-face {
+  font-family: space;
+  src: url(./fonts/spacemission.otf);
+}
+
 html,
 body{
   margin: 0 auto;
@@ -19,4 +24,63 @@ body{
   border-right: 2px solid;
   border-left: 2px solid;
   border-image: linear-gradient(to bottom, red, Purple) 0 1;
+}
+
+.ui-div{
+  position: absolute;
+  top:50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1280px;
+  height: 100%;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+}
+
+.ui-logo-image{
+  display: flex;
+  position: absolute;
+  top:50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 50%;
+  opacity: 15%;
+}
+
+.ui-div p{
+  position: relative;
+  color: white;
+  font-family: 'space';
+  font-size: 1.5rem;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  top: 0.3em;
+}
+
+.ui-ul{
+  position: relative;
+  margin: 0;
+  padding-left: 1em;
+}
+
+.ui-exp-bar{
+  position: relative;
+  max-width: 99%;
+  width: 100%;
+  margin: 0.25em auto 0;
+  height: 10px;
+  background: #222;
+  overflow: hidden;
+}
+
+#ui-exp-bar-fill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 25%;
+  background: #ceb669;
+  transition: all 0.3s;
 }

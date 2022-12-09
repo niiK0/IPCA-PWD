@@ -1,6 +1,3 @@
-// const canvas = /** @type {HTMLCanvasElement} */ (
-//   document.querySelector("canvas")
-// );
 const canvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("game-canvas")
 );
@@ -18,8 +15,10 @@ enemy_projectile_image.src = "./img/laser2.png"
 const player_projectile_image = new Image()
 player_projectile_image.src = "./img/laser.png"
 
+const player_image = new Image()
+player_image.src = "./img/player.png"
+
 canvas.width = bg_image.width;
-// canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 //#region CLASSES
@@ -31,19 +30,20 @@ class Player {
     };
 
     this.rotation = 0;
-
-    const image = new Image();
-    image.src = "./img/player.png";
-    image.onload = () => {
-      const scale = 0.5;
-      this.image = image;
-      this.height = image.height * scale;
-      this.width = image.width * scale;
-      this.position = {
-        x: canvas.width / 2 - this.width / 2,
-        y: canvas.height - this.height - 20,
-      };
+    const scale = 0.5;
+    this.image = player_image;
+    this.height = this.image.height * scale;
+    this.width = this.image.width * scale;
+    this.position = {
+      x: canvas.width / 2 - this.width / 2,
+      y: canvas.height - this.height - 20,
     };
+    this.player_level = 1
+    this.player_exp = 0
+    this.player_next_exp = 10
+    this.max_hearts = powerups.health[powerups.health.current_level]
+    this.current_hearts = this.max_hearts
+    this.amount = powerups.multiple_attack[powerups.multiple_attack.current_level]
   }
 
   draw() {
@@ -70,6 +70,39 @@ class Player {
 
     //Restore canvas after rotation
     c.restore();
+
+    for(let i = 0; i < this.current_hearts; i++){
+      // const hearts_width = 
+      const hearts_position = {
+        x: canvas.width - (this.width/2) * (i+1) -8,
+        y: 20
+      }
+      c.drawImage(this.image, hearts_position.x, hearts_position.y, this.width /2, this.height/2)
+    }
+  }
+
+  level_up(){
+    this.player_level++
+    const level_text = document.getElementById('ui-level-text')
+    level_text.textContent = this.player_level
+    this.player_next_exp = this.player_next_exp * 1.3
+    this.player_exp = 0
+  }
+
+  earn_exp(){
+    this.player_exp++
+    const exp_bar = document.getElementById('ui-exp-bar-fill')
+    exp_bar.style.width = (this.player_exp*100)/this.player_next_exp + '%'
+  }
+
+  set_defaults(){
+    //level
+    const level_text = document.getElementById('ui-level-text')
+    level_text.textContent = this.player_level
+
+    //exp
+    const exp_bar = document.getElementById('ui-exp-bar-fill')
+    exp_bar.style.width = this.player_exp + '%'
   }
 
   update() {
@@ -77,26 +110,24 @@ class Player {
       this.draw();
       this.position.x += this.velocity.x;
     }
+    if(this.player_exp >= this.player_next_exp){
+      this.level_up()
+    }
   }
 }
 
 class Projectile {
   constructor({ position, velocity }) {
-    // const image = new Image();
-    // image.src = "./img/laser.png";
-    // image.onload = () => {
       const scale = 0.4;
       this.image = player_projectile_image;
       this.position = position;
       this.velocity = velocity;
       this.width = this.image.width * scale;
       this.height = this.image.height * scale;
-    // };
+      this.pierce_counter = powerups.attack_pierce[powerups.attack_pierce.current_level]
   }
 
   draw() {
-    c.beginPath();
-    c.rect(this.position.x, this.position.y, this.width, this.height);
     c.drawImage(
       this.image,
       this.position.x,
@@ -104,7 +135,6 @@ class Projectile {
       this.width,
       this.height
     );
-    c.closePath();
   }
 
   update() {
@@ -115,21 +145,15 @@ class Projectile {
 
 class EnemyProjectile {
   constructor({ position, velocity }) {
-    // const image = new Image();
-    // image.src = "./img/laser2.png";
-    // image.onload = () => {
       const scale = 0.4;
       this.image = enemy_projectile_image;
       this.position = position;
       this.velocity = velocity;
       this.width = this.image.width * scale;
       this.height = this.image.height * scale;
-    // };
   }
 
   draw() {
-    c.beginPath();
-    c.rect(this.position.x, this.position.y, this.width, this.height);
     c.drawImage(
       this.image,
       this.position.x,
@@ -137,7 +161,6 @@ class EnemyProjectile {
       this.width,
       this.height
     );
-    c.closePath();
   }
 
   update() {
@@ -148,9 +171,6 @@ class EnemyProjectile {
 
 class Enemy {
   constructor({position}) {
-    // const image = new Image();
-    // image.src = "./img/enemy.png";
-    // image.onload = () => {
       const scale = 1;
       this.image = enemy_image;
       this.height = this.image.height * scale;
@@ -159,7 +179,6 @@ class Enemy {
         x: position.x,
         y: position.y,
       };
-    // };
   }
 
   draw() {
@@ -221,7 +240,6 @@ class Grid {
             },
           })
         )
-
       }
     }
   }
@@ -242,10 +260,7 @@ class Grid {
 
 
 //PLAYER VARS
-const player = new Player()
-
-let player_shoot_frames = 1
-let player_shoot_interval = 50;
+let player_shoot_frames = 0
 
 const projectiles = [];
 
@@ -262,6 +277,58 @@ const keys = {
   },
 };
 
+const powerups = {
+  attack_speed: {
+    0: 50,
+    1: 40,
+    2: 30,
+    3: 20,
+    4: 15,
+    5: 10,
+    current_level: 0
+  },
+
+  health: {
+    0: 3,
+    1: 4,
+    2: 5,
+    3: 6,
+    4: 7,
+    5: 8,
+    current_level: 0
+  },
+
+  multiple_attack: {
+    0: 1,
+    1: 2,
+    2: 3,
+    current_level: 0
+  },
+
+  attack_pierce: {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    current_level: 0
+  },
+
+  bullet_speed: {
+    0: 7,
+    1: 9,
+    2: 11,
+    3: 13,
+    4: 15,
+    5: 17,
+    current_level: 0
+  },
+}
+
+const player = new Player()
+player.set_defaults()
+
+var score = 0;
+
 //ENEMY VARS
 const grids = []
 let grid_frames = 0
@@ -272,7 +339,6 @@ let enemy_shoot_interval = 200;
 
 let enemy_fake_width = 34
 let enemy_fake_height = 28
-
 const enemy_projectiles = [];
 
 let debug = true
@@ -280,17 +346,18 @@ let debug = true
 function animate() {
   requestAnimationFrame(animate);
 
-  //Background
+//#region BACKGROUND STUFF
+  //image
   c.drawImage(bg_image, 0, 0, canvas.width, canvas.height);
 
   //black bg to fade
   c.fillStyle = "rgba(0, 0, 0, 0.8)";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  
   //draw the "rain" for stars effect
   rain_draw();
   
+  //slow particles
   particles.forEach((particle, i) => {
     if (particle.position.y - particle.radius >= canvas.height) {
       particle.position.x = Math.random() * canvas.width; //random
@@ -305,16 +372,14 @@ function animate() {
       particle.update();
     }
   });
+  //#endregion
   
   player.update();
 
   projectiles.forEach((projectile, index) => {
     if (projectile.position.y + projectile.height <= 0) {
       setTimeout(() => {
-        const projectile_found = projectiles.find(projectile2 => projectile2 === projectile)
-        if(projectile_found){
           projectiles.splice(index, 1);
-        }
       }, 0);
     } else {
       projectile.update();
@@ -324,22 +389,25 @@ function animate() {
   enemy_projectiles.forEach((enemy_projectile, enemy_projectile_index) => {
     if (enemy_projectile.position.y + enemy_projectile.height >= canvas.height) {
       setTimeout(() => {
-        const enemy_projectile_found = enemy_projectiles.find(enemy_projectile2 => enemy_projectile2 === enemy_projectile)
-        if(enemy_projectile_found){
           enemy_projectiles.splice(enemy_projectile_index, 1);
-        }
       }, 0);
     } else {
       enemy_projectile.update();
     }
 
-    // //PLAYER COLLISION
+    //PLAYER COLLISION
     if(enemy_projectile.position.y + enemy_projectile.height >= player.position.y
       && enemy_projectile.position.x + enemy_projectile.width >= player.position.x
       && enemy_projectile.position.x <= player.position.x + player.width
       ){
       //TAKE PLAYER LIVES
-      console.log("you died")
+      const enemy_projectile_found = enemy_projectiles.find(enemy_projectile2 => enemy_projectile2 === enemy_projectile)
+      if(enemy_projectile_found){
+        setTimeout(() => {
+          enemy_projectiles.splice(enemy_projectile_index, 1);
+      }, 0);
+        player.current_hearts--
+      }
     }
   });
 
@@ -354,6 +422,7 @@ function animate() {
     grid.enemies.forEach((enemy, i) => {
       enemy.update({velocity: grid.velocity})
 
+      //COLLISION
       projectiles.forEach((projectile, j) =>{
         if(projectile.position.y <= enemy.position.y + enemy_fake_height
           && projectile.position.x + projectile.width >= enemy.position.x
@@ -366,7 +435,13 @@ function animate() {
             
             if(enemy_found && projectile_found){
               grid.enemies.splice(i, 1)
-              projectiles.splice(j, 1)
+              if(projectile.pierce_counter <= 0){
+                projectiles.splice(j, 1)
+              }else{
+                projectile.pierce_counter--
+              }
+              //give exp per mob
+              player.earn_exp()
 
               if(grid.enemies.length > 0){
                 const first_enemy = grid.enemies[0]
@@ -382,11 +457,16 @@ function animate() {
         }
       })
     });
+
+    if(grid.enemies[grid.enemies.length - 1].position.y + enemy_fake_height >= player.position.y - 10){
+      console.log("game lost, grid reached end")
+      grids.splice(grid_index, 1)
+    }
   });
 
   if(grid_frames % grid_spawn_interval === 0){
     grids.push(new Grid())
-    grid_spawn_interval = Math.floor(Math.random() * 1000 + 1000)
+    grid_spawn_interval = Math.floor(Math.random() * 1000 + 1000) //random
     grid_frames = 0
   }
 
@@ -419,24 +499,76 @@ function animate() {
   if (keys.space.pressed) {
     if (keys.space.can_shoot) {
       keys.space.can_shoot = false;
-      projectiles.push(
-        new Projectile({
-          position: {
-            x: player.position.x + player.width / 2 - 3, //3 pixels to adjust the position
-            y: player.position.y,
-          },
-          velocity: -10,
-        })
-      );
+      if(player.amount === 1){
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 2 - 3, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 13,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+      }else if(player.amount === 2){
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 4, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 3,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 1.5, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 3,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+      }else if(player.amount === 3){
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 4, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 3,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 1.5, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 3,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+        
+        projectiles.push(
+          new Projectile({
+            position: {
+              x: player.position.x + player.width / 2 - 3, //3 pixels to adjust the position
+              y: player.position.y - player.height/2 + 13,
+            },
+            velocity: -powerups.bullet_speed[powerups.bullet_speed.current_level],
+          })
+        );
+      }
     }
   }
   //#endregion
 
   //#region PLAYER SHOOTING COOLDOWN
-  if (player_shoot_frames % player_shoot_interval === 0) {
+  if (player_shoot_frames % powerups.attack_speed[powerups.attack_speed.current_level] === 0) {
     if (!keys.space.can_shoot) {
       keys.space.can_shoot = true;
-      player_shoot_frames = 1
+      player_shoot_frames = 0
     }
   }
   //#endregion
