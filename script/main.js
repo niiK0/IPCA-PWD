@@ -285,7 +285,7 @@ const powerups = {
     3: 20,
     4: 15,
     5: 10,
-    current_level: 0
+    current_level: 5
   },
 
   health: {
@@ -295,14 +295,14 @@ const powerups = {
     3: 6,
     4: 7,
     5: 8,
-    current_level: 0
+    current_level: 3
   },
 
   multiple_attack: {
     0: 1,
     1: 2,
     2: 3,
-    current_level: 0
+    current_level: 2
   },
 
   attack_pierce: {
@@ -310,7 +310,7 @@ const powerups = {
     1: 1,
     2: 2,
     3: 3,
-    current_level: 0
+    current_level: 3
   },
 
   bullet_speed: {
@@ -320,7 +320,7 @@ const powerups = {
     3: 13,
     4: 15,
     5: 17,
-    current_level: 0
+    current_level: 5
   },
 }
 
@@ -356,6 +356,9 @@ function animate() {
 
   //draw the "rain" for stars effect
   rain_draw();
+
+  score_text = document.getElementById('ui-score-text')
+  score_text.textContent = score
   
   //slow particles
   particles.forEach((particle, i) => {
@@ -442,6 +445,7 @@ function animate() {
               }
               //give exp per mob
               player.earn_exp()
+              score+=100
 
               if(grid.enemies.length > 0){
                 const first_enemy = grid.enemies[0]
