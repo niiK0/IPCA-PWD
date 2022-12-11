@@ -48,6 +48,7 @@ body{
   opacity: 15%;
 }
 
+
 .ui-div p{
   position: relative;
   color: white;
@@ -56,13 +57,25 @@ body{
   z-index: 10;
   margin: 0;
   padding: 0;
-  top: 0.3em;
+  top: 0.1em;
 }
 
 .ui-ul{
   position: relative;
   margin: 0;
   padding-left: 1em;
+  font-size: 1rem;
+}
+
+.ui-powerups-ul{
+  position: relative;
+  margin: 0;
+  top: 20%;
+  padding-left: 1em;
+}
+
+.ui-powerups-ul p{
+  font-size: 1rem;
 }
 
 .ui-exp-bar{
@@ -70,9 +83,16 @@ body{
   max-width: 99%;
   width: 100%;
   margin: 0.25em auto 0;
-  height: 10px;
+  height: 2em;
   background: #222;
   overflow: hidden;
+}
+
+.ui-exp-bar p{
+  position: absolute;
+  top:50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #ui-exp-bar-fill{

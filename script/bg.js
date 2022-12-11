@@ -1,6 +1,5 @@
 let drops = []
 let particles = []
-let meteors = []
 
 const star_colors = ['white', 'yellow', 'orange']
 
@@ -148,26 +147,5 @@ class Particle{
         })
       )
     }
-    console.log(particles)
   }
-//#endregion
-
-//#region METEORS
-function meteor_setup(){
-  for(let i = 0; i < 8; i++){
-    meteors.push(
-      new Meteor({
-        position: {
-          x: Math.random() * canvas.width, //random
-          y: -80
-        },
-        velocity: {
-          x: 0,
-          y: 3
-        }
-      })
-    )
-  }
-  console.log(meteors)
-}
 //#endregion
