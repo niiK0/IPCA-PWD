@@ -1,0 +1,6 @@
+- Meteoritos
+- Timer
+- Jogador morrer
+- Sons
+- Boss
+- API

@@ -18,6 +18,10 @@ player_projectile_image.src = "./img/laser.png"
 const player_image = new Image()
 player_image.src = "./img/player.png"
 
+const meteor_image = [new Image(), new Image()]
+meteor_image[0].src = "./img/meteor.png"
+meteor_image[1].src = "./img/meteor1.png"
+
 canvas.width = bg_image.width;
 canvas.height = innerHeight;
 
@@ -30,7 +34,7 @@ class Player {
     };
 
     this.rotation = 0;
-    const scale = 0.5;
+    const scale = powerups.player_size[powerups.player_size.current_level];
     this.image = player_image;
     this.height = this.image.height * scale;
     this.width = this.image.width * scale;
@@ -72,12 +76,14 @@ class Player {
     c.restore();
 
     for(let i = 0; i < this.current_hearts; i++){
-      // const hearts_width = 
+      const hearts_scale = 0.5
+      const hearts_width = this.image.width * hearts_scale
+      const hearts_height = this.image.height * hearts_scale
       const hearts_position = {
-        x: canvas.width - (this.width/2) * (i+1) -8,
+        x: canvas.width - (hearts_width/2) * (i+1) -6,
         y: 20
       }
-      c.drawImage(this.image, hearts_position.x, hearts_position.y, this.width /2, this.height/2)
+      c.drawImage(this.image, hearts_position.x, hearts_position.y, hearts_width /2, hearts_height/2)
     }
   }
 
@@ -125,6 +131,32 @@ class Projectile {
       this.width = this.image.width * scale;
       this.height = this.image.height * scale;
       this.pierce_counter = powerups.attack_pierce[powerups.attack_pierce.current_level]
+  }
+
+  draw() {
+    c.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+
+  update() {
+    this.draw();
+    this.position.y += this.velocity;
+  }
+}
+
+class Meteor {
+  constructor({ position, velocity }) {
+      const scale = 1
+      this.image = meteor_image[Math.floor(Math.random() * 2)]; //random
+      this.position = position
+      this.velocity = velocity
+      this.width = this.image.width * scale
+      this.height = this.image.height * scale
   }
 
   draw() {
@@ -285,7 +317,7 @@ const powerups = {
     3: 20,
     4: 15,
     5: 10,
-    current_level: 5
+    current_level: 0
   },
 
   health: {
@@ -295,14 +327,14 @@ const powerups = {
     3: 6,
     4: 7,
     5: 8,
-    current_level: 3
+    current_level: 0
   },
 
   multiple_attack: {
     0: 1,
     1: 2,
     2: 3,
-    current_level: 2
+    current_level: 0
   },
 
   attack_pierce: {
@@ -310,7 +342,7 @@ const powerups = {
     1: 1,
     2: 2,
     3: 3,
-    current_level: 3
+    current_level: 0
   },
 
   bullet_speed: {
@@ -320,7 +352,23 @@ const powerups = {
     3: 13,
     4: 15,
     5: 17,
-    current_level: 5
+    current_level: 0
+  },
+
+  player_speed: {
+    0: 4,
+    1: 5,
+    2: 6,
+    3: 7,
+    current_level: 3
+  },
+
+  player_size: {
+    0: 0.5,
+    1: 0.4,
+    2: 0.35,
+    3: 0.3,
+    current_level: 0
   },
 }
 
@@ -376,6 +424,16 @@ function animate() {
     }
   });
   //#endregion
+  
+ //meteors
+ meteors.forEach((meteor) => {
+    if (meteor.position.y >= canvas.height) {
+      meteor.position.x = Math.random() * canvas.width; //random
+      meteor.position.y = -meteor.height;
+    }
+
+    meteor.update();
+  });
   
   player.update();
 
@@ -487,13 +545,13 @@ function animate() {
 
   //#region KEYS MOVE/SHOOT
   if (keys.a.pressed && player.position.x >= 10) {
-    player.velocity.x = -7;
+    player.velocity.x = -powerups.player_speed[powerups.player_speed.current_level];
     player.rotation = -0.15;
   } else if (
     keys.d.pressed &&
     player.position.x + player.width <= canvas.width - 10
   ) {
-    player.velocity.x = 7;
+    player.velocity.x = powerups.player_speed[powerups.player_speed.current_level];
     player.rotation = 0.15;
   } else {
     player.velocity.x = 0;
@@ -621,4 +679,7 @@ rain_setup();
 
 //STARS
 stars_setup();
+
+//METEOR
+meteor_setup()
 //#endregion
