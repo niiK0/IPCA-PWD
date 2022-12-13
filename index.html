@@ -8,24 +8,68 @@
     <title>Infinite Fighter</title>
   </head>
   <body>
-    <div id="particles-js">
-      <div class="ui-div">
-        <img src="./img/logo.png" alt="Logo Image" class="ui-logo-image">
+    <div id="particles-js"></div>
+    <div class="ui-container">
+      <div id="ui-start-game-container">
+        <div class="ui-start-game-outer-div">
+          <div class="ui-start-game-inner-div">
+            <p class="ui-start-game-title">Press to start the game.</p>
+            <input type="button" value="Start" id="ui-start-game-btn">
+          </div>
+        </div>
+      </div>
+      <div id="ui-div">
+        <div id="ui-boss-container">
+          <p>Boss Life: <span id="ui-boss-life">0</span></p>
+        </div>
+        <div class="ui-centered">
+          <img src="./img/logo.png" alt="Logo Image" class="ui-logo-image">
+        </div>
         <div class="ui-exp-bar">
+          <p>Level <span id="ui-level-text">0</span></p>
           <span id="ui-exp-bar-fill"></span>
         </div>
         <ul class="ui-ul">
           <li>
-            <p>Score: <span id="ui-score-text">0</span></p>
+            <p style="font-size: 2.5rem;">Time: <span id="ui-time-text">0</span></p>
           </li>
           <li>
-            <p>Level: <span id="ui-level-text">0</span></p>
+            <p>Score: <span id="ui-score-text">0</span></p>
+          </li>
+        </ul>
+        <ul class="ui-powerups-ul">
+          <li>
+            <p style="font-size: 1.5rem;">Powerups</p>
+          </li>
+          <li>
+            <p>Attack speed: <span id="ui-powerup-attack-speed">0</span></p>
+          </li>
+          <li>
+            <p>Attack pierce: <span id="ui-powerup-attack-pierce">0</span></p>
+          </li>
+          <li>
+            <p>Bullet speed: <span id="ui-powerup-bullet-speed">0</span></p>
+          </li>
+          <li>
+            <p>Multiple attack: <span id="ui-powerup-multiple-attack">0</span></p>
+          </li>
+          <li>
+            <p>Max health: <span id="ui-powerup-max-health">0</span></p>
+          </li>
+          <li>
+            <p>Player speed: <span id="ui-powerup-player-speed">0</span></p>
+          </li>
+          <li>
+            <p>Player size: <span id="ui-powerup-player-size">0</span></p>
           </li>
         </ul>
       </div>
-      <canvas id="game-canvas"></canvas>
+      <canvas id="game-canvas">
+      </canvas>
     </div>
     <script src="./particles.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="script/api.js"></script>
     <script type="text/javascript" src="script/bg.js"></script>
     <script type="text/javascript" src="script/main.js"></script>
   </body>

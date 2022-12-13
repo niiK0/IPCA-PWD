@@ -1,6 +1,9 @@
-- Meteoritos
-- Timer
-- Jogador morrer
-- Sons
-- Boss
-- API
+x - Meteor
+x - Timer
+x - Game change by time
+x - Level up powerups
+X - Jogador morrer
+X - Sons
+? - Particles
+x - Boss
+x - API

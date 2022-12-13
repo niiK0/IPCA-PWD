@@ -9,6 +9,12 @@ bg_image.src = "./img/background.jpg";
 const enemy_image = new Image()
 enemy_image.src = "./img/enemy.png"
 
+const boss_image = new Image()
+boss_image.src = "./img/boss.png"
+
+const boss_ui = document.getElementById('ui-boss-container')
+const boss_life_text = document.getElementById('ui-boss-life')
+
 const enemy_projectile_image = new Image()
 enemy_projectile_image.src = "./img/laser2.png"
 
@@ -22,6 +28,26 @@ const meteor_image = [new Image(), new Image()]
 meteor_image[0].src = "./img/meteor.png"
 meteor_image[1].src = "./img/meteor1.png"
 
+const shot_sound = new Audio('./sounds/Shot.mp3');
+shot_sound.volume = 0.05
+
+const enemy_hit_sound = new Audio("./sounds/EnemyHit.mp3");
+enemy_hit_sound.volume = 0.05
+
+const player_hit_sound = new Audio("./sounds/PlayerHit.mp3");
+player_hit_sound.volume = 0.05
+
+const explosion_sound = new Audio("./sounds/Explosion.mp3");
+explosion_sound.volume = 0.01
+
+const level_up_sound = new Audio("./sounds/LevelUp.mp3")
+level_up_sound.volume = 0.05
+
+const bg_music = new Audio("./sounds/BackgroundMusic.mp3")
+bg_music.volume = 0.05
+
+const time_text = document.getElementById('ui-time-text')
+
 canvas.width = bg_image.width;
 canvas.height = innerHeight;
 
@@ -34,10 +60,10 @@ class Player {
     };
 
     this.rotation = 0;
-    const scale = powerups.player_size[powerups.player_size.current_level];
+    this.scale = powerups.player_size[powerups.player_size.current_level];
     this.image = player_image;
-    this.height = this.image.height * scale;
-    this.width = this.image.width * scale;
+    this.height = this.image.height * this.scale;
+    this.width = this.image.width * this.scale;
     this.position = {
       x: canvas.width / 2 - this.width / 2,
       y: canvas.height - this.height - 20,
@@ -81,18 +107,118 @@ class Player {
       const hearts_height = this.image.height * hearts_scale
       const hearts_position = {
         x: canvas.width - (hearts_width/2) * (i+1) -6,
-        y: 20
+        y: 40
       }
       c.drawImage(this.image, hearts_position.x, hearts_position.y, hearts_width /2, hearts_height/2)
+    }
+
+    if(this.current_hearts <= 0){
+      setTimeout(() => {
+        this.current_hearts = 3
+        alert("You lost!")
+        window.location.href = window.location.href;
+      },0)
     }
   }
 
   level_up(){
-    this.player_level++
-    const level_text = document.getElementById('ui-level-text')
-    level_text.textContent = this.player_level
-    this.player_next_exp = this.player_next_exp * 1.3
-    this.player_exp = 0
+    setTimeout(() =>{
+      level_up_sound.currentTime = 0
+      level_up_sound.play()
+      this.player_level++
+      const level_text = document.getElementById('ui-level-text')
+      level_text.textContent = this.player_level
+      this.player_next_exp = this.player_next_exp * 1.3
+      this.player_exp = 0
+    
+      let upgraded = false
+      const random_upgrade = Math.floor(Math.random() * 8)
+  
+      do{
+        switch(random_upgrade){
+          case 0:
+            if(powerups.attack_speed.current_level >= powerups.attack_speed.length - 1)
+              break
+            else{
+              powerups.attack_speed.current_level++
+              upgraded=true
+            }
+            break;
+          case 1:
+            if(powerups.attack_pierce.current_level >= powerups.attack_pierce.length - 1)
+              break
+            else{
+              powerups.attack_pierce.current_level++
+              upgraded=true
+            }
+            break;
+          case 2:
+            if(powerups.bullet_speed.current_level >= powerups.bullet_speed.length - 1)
+              break
+            else{
+              powerups.bullet_speed.current_level++
+              upgraded=true
+            }
+            break;
+          case 3:
+            if(powerups.multiple_attack.current_level >= powerups.multiple_attack.length - 1)
+              break
+            else{
+              powerups.multiple_attack.current_level++
+              this.amount = powerups.multiple_attack[powerups.multiple_attack.current_level]
+              upgraded=true
+            }
+            break;
+          case 4:
+            if(powerups.health.current_level >= powerups.health.length - 1)
+              break
+            else{
+              powerups.health.current_level++
+              this.max_hearts = powerups.health[powerups.health.current_level]
+              this.current_hearts++
+              upgraded=true
+            }
+            break;
+          case 5:
+            if(powerups.player_speed.current_level >= powerups.player_speed.length - 1)
+              break
+            else{
+              powerups.player_speed.current_level++
+              upgraded=true
+            }
+            break;
+          case 6:
+            if(powerups.player_size.current_level >= powerups.player_size.length - 1)
+              break
+            else{
+              powerups.player_size.current_level++
+              this.scale = powerups.player_size[powerups.player_size.current_level]
+              upgraded=true
+            }
+            break;
+        }
+      }while(!upgraded)
+  
+      this.write_powerups()
+    }, 0)
+  }
+
+  write_powerups(){
+    const attack_speed_text = document.getElementById('ui-powerup-attack-speed')
+    const attack_pierce_text = document.getElementById('ui-powerup-attack-pierce')
+    const bullet_speed_text = document.getElementById('ui-powerup-bullet-speed')
+    const multiple_attack_text = document.getElementById('ui-powerup-multiple-attack')
+    const max_health_text = document.getElementById('ui-powerup-max-health')
+    const player_speed_text = document.getElementById('ui-powerup-player-speed')
+    const player_size_text = document.getElementById('ui-powerup-player-size')
+
+    attack_speed_text.textContent = powerups.attack_speed.current_level
+    attack_pierce_text.textContent = powerups.attack_pierce.current_level
+    bullet_speed_text.textContent = powerups.bullet_speed.current_level
+    multiple_attack_text.textContent = powerups.multiple_attack.current_level
+    max_health_text.textContent = powerups.health.current_level
+    player_speed_text.textContent = powerups.player_speed.current_level
+    player_size_text.textContent = powerups.player_size.current_level
   }
 
   earn_exp(){
@@ -131,6 +257,8 @@ class Projectile {
       this.width = this.image.width * scale;
       this.height = this.image.height * scale;
       this.pierce_counter = powerups.attack_pierce[powerups.attack_pierce.current_level]
+      shot_sound.currentTime = 0
+      shot_sound.play()
   }
 
   draw() {
@@ -150,11 +278,11 @@ class Projectile {
 }
 
 class Meteor {
-  constructor({ position, velocity }) {
+  constructor({position, velocity }) {
       const scale = 1
-      this.image = meteor_image[Math.floor(Math.random() * 2)]; //random
-      this.position = position
+      this.image = meteor_image[Math.floor(Math.random() * 2)] //random
       this.velocity = velocity
+      this.position = position
       this.width = this.image.width * scale
       this.height = this.image.height * scale
   }
@@ -171,7 +299,7 @@ class Meteor {
 
   update() {
     this.draw();
-    this.position.y += this.velocity;
+    this.position.y += this.velocity.y;
   }
 }
 
@@ -232,7 +360,7 @@ class Enemy {
   }
 
   shoot(enemy_projectiles){
-    enemy_projectiles.push(new EnemyProjectile({
+       enemy_projectiles.push(new EnemyProjectile({
       position: {
         x: this.position.x + this.width / 2 - 3, //3 pixels to adjust the position
         y: this.position.y + this.height
@@ -242,8 +370,82 @@ class Enemy {
   }
 }
 
+class Boss {
+  constructor({position, velocity}) {
+      const scale = 0.6;
+      this.image = boss_image;
+      this.height = this.image.height * scale;
+      this.width = this.image.width * scale;
+      this.position = position
+      this.velocity = velocity
+      this.backup_velocity_x = velocity.x
+      this.hearts = 100
+      this.arrived = false
+  }
+
+  draw() {
+    c.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+
+    if(minutes>=5 && this.position.y >= 60 && !this.arrived){
+      this.velocity.y = 0
+      this.velocity.x = this.backup_velocity_x
+      this.arrived = true
+    }
+
+    if(minutes>=5 && this.position.y < 60){
+      this.position.y += this.velocity.y
+      this.velocity.x = 0
+    }
+
+    if(this.position.x + this.width >= canvas.width || this.position.x <= 0){
+      this.velocity.x = -this.velocity.x
+    }
+
+    if(this.hearts <= 0){
+      setTimeout(() => {
+        this.hearts = 100
+        alert("You Won!")
+        window.location.href = window.location.href;
+      },0)
+    }
+
+    setTimeout(() => {
+      boss_life_text.textContent = parseInt(this.hearts)
+    },0)
+    
+  }
+
+  shoot(enemy_projectiles){
+    enemy_projectiles.push(new EnemyProjectile({
+      position: {
+        x: this.position.x + this.width / 4.5, //3 pixels to adjust the position
+        y: this.position.y + this.height
+      },
+      velocity: 6
+    }))
+    enemy_projectiles.push(new EnemyProjectile({
+      position: {
+        x: this.position.x + this.width / 1.35, //3 pixels to adjust the position
+        y: this.position.y + this.height
+      },
+      velocity: 6
+    }))
+  }
+}
+
 class Grid {
-  constructor() {
+  constructor({col, row}) {
     this.position = {
       x: 0,
       y: 0,
@@ -256,8 +458,10 @@ class Grid {
 
     this.enemies = [];
 
-    const columns = Math.floor(Math.random() * 5 + 5); //random
-    const rows = Math.floor(Math.random() * 5 + 2); //random
+    this.col = col
+    this.row = row
+    const columns = Math.floor(Math.random() * this.col.min + this.col.max); //random
+    const rows = Math.floor(Math.random() * this.row.min + this.row.max); //random
 
     this.width = columns * enemy_fake_width
     this.height = rows * enemy_fake_height
@@ -290,8 +494,9 @@ class Grid {
 }
 //#endregion
 
-
 //PLAYER VARS
+let player = null
+
 let player_shoot_frames = 0
 
 const projectiles = [];
@@ -314,9 +519,6 @@ const powerups = {
     0: 50,
     1: 40,
     2: 30,
-    3: 20,
-    4: 15,
-    5: 10,
     current_level: 0
   },
 
@@ -360,7 +562,7 @@ const powerups = {
     1: 5,
     2: 6,
     3: 7,
-    current_level: 3
+    current_level: 0
   },
 
   player_size: {
@@ -372,24 +574,43 @@ const powerups = {
   },
 }
 
-const player = new Player()
-player.set_defaults()
-
 var score = 0;
 
 //ENEMY VARS
 const grids = []
 let grid_frames = 0
-let grid_spawn_interval = Math.floor(Math.random() * 1000 + 1000)
+let grid_spawn_interval = 1500
+let grid_col = {min: 2, max: 5}
+let grid_row = {min: 2, max: 3}
 
-let enemy_shoot_frames = 1
-let enemy_shoot_interval = 200;
+let enemy_shoot_frames = 0
+let enemy_shoot_interval = 300;
 
 let enemy_fake_width = 34
 let enemy_fake_height = 28
 const enemy_projectiles = [];
 
 let debug = true
+
+//BOSS VARS
+let boss_shoot_frames = 0
+let boss_shoot_interval = 100;
+
+const boss = new Boss({
+    position: {
+      x: canvas.width/2 - boss_image.width * 0.1,
+      y: -boss_image.height
+    },
+    velocity: {
+      x: 6,
+      y: 3
+    }
+  })
+
+//METEOR VARS
+const meteors = []
+let meteor_frames = 0
+let meteor_spawn_interval = 600
 
 function animate() {
   requestAnimationFrame(animate);
@@ -426,16 +647,42 @@ function animate() {
   //#endregion
   
  //meteors
- meteors.forEach((meteor) => {
+ meteors.forEach((meteor, i) => {
     if (meteor.position.y >= canvas.height) {
-      meteor.position.x = Math.random() * canvas.width; //random
-      meteor.position.y = -meteor.height;
+      meteors.slice(i, 1)
+    }
+
+    if(meteor.position.y + meteor.height >= player.position.y
+      && meteor.position.x + meteor.width >= player.position.x
+      && meteor.position.x <= player.position.x + player.width
+      ){
+      play: player_hit_sound;
+      //TAKE PLAYER LIVES
+      const meteor_found = meteors.find(meteor2 => meteor2 === meteor)
+      if(meteor_found){
+        setTimeout(() => {
+          meteors.splice(i, 1);
+      }, 0);
+        player.current_hearts--
+        explosion_sound.currentTime = 0
+        explosion_sound.play()
+      }
     }
 
     meteor.update();
   });
   
   player.update();
+  if(minutes>=5){
+    boss.update()
+    
+    boss_ui.style.visibility = 'visible'
+
+    if(boss_shoot_frames % boss_shoot_interval === 0){
+      boss.shoot(enemy_projectiles)
+      boss_shoot_frames = 0
+    }
+  }
 
   projectiles.forEach((projectile, index) => {
     if (projectile.position.y + projectile.height <= 0) {
@@ -444,6 +691,28 @@ function animate() {
       }, 0);
     } else {
       projectile.update();
+    }
+
+    if(
+      projectile.position.y <= boss.position.y + boss.height
+      && projectile.position.x + projectile.width >= boss.position.x
+      && projectile.position.x <= boss.position.x + boss.width
+      && projectile.position.y + projectile.width >= boss.position.y
+    ){
+      setTimeout(()=>{
+        const projectile_found = projectiles.find(projectile2 => projectile2 === projectile)
+        
+        if(projectile_found){
+          boss.hearts--
+          projectiles.splice(index, 1)
+          enemy_hit_sound.currentTime = 0
+          enemy_hit_sound.play()
+
+          //give exp per mob
+          player.earn_exp()
+          score+=100
+        }
+      }, 0)
     }
   });
   
@@ -461,6 +730,8 @@ function animate() {
       && enemy_projectile.position.x + enemy_projectile.width >= player.position.x
       && enemy_projectile.position.x <= player.position.x + player.width
       ){
+      
+      
       //TAKE PLAYER LIVES
       const enemy_projectile_found = enemy_projectiles.find(enemy_projectile2 => enemy_projectile2 === enemy_projectile)
       if(enemy_projectile_found){
@@ -468,6 +739,8 @@ function animate() {
           enemy_projectiles.splice(enemy_projectile_index, 1);
       }, 0);
         player.current_hearts--
+        player_hit_sound.currentTime = 0
+        player_hit_sound.play()
       }
     }
   });
@@ -490,6 +763,7 @@ function animate() {
           && projectile.position.x <= enemy.position.x + enemy_fake_width
           && projectile.position.y + projectile.width >= enemy.position.y
           ){
+          
           setTimeout(()=>{
             const enemy_found = grid.enemies.find(enemy2 => enemy2 === enemy)
             const projectile_found = projectiles.find(projectile2 => projectile2 === projectile)
@@ -501,6 +775,9 @@ function animate() {
               }else{
                 projectile.pierce_counter--
               }
+              enemy_hit_sound.currentTime = 0
+              enemy_hit_sound.play()
+
               //give exp per mob
               player.earn_exp()
               score+=100
@@ -521,27 +798,34 @@ function animate() {
     });
 
     if(grid.enemies[grid.enemies.length - 1].position.y + enemy_fake_height >= player.position.y - 10){
-      console.log("game lost, grid reached end")
       grids.splice(grid_index, 1)
+      player.current_hearts = 0
     }
   });
 
   if(grid_frames % grid_spawn_interval === 0){
-    grids.push(new Grid())
-    grid_spawn_interval = Math.floor(Math.random() * 1000 + 1000) //random
+    grids.push(new Grid({
+      col: grid_col,
+      row: grid_row
+    }))
     grid_frames = 0
   }
 
-  //FUN GLITCH LOL
-  // enemy_projectiles.forEach((projectile, index) => {
-  //   if (projectile.position.y + projectile.height >= canvas.height) {
-  //     setTimeout(() => {
-  //       enemy_projectiles.splice(index, 1);
-  //     }, 0);
-  //   } else {
-  //     projectile.update();
-  //   }
-  // });
+  if(meteor_frames % meteor_spawn_interval === 0){
+    meteors.push(
+      new Meteor({
+        position: {
+          x: Math.random() * canvas.width, //random
+          y: -80 * (Math.random() * 3),
+        },
+        velocity: {
+          x: 0,
+          y: 1
+        }
+      })
+    )
+    meteor_frames = 0
+  }
 
   //#region KEYS MOVE/SHOOT
   if (keys.a.pressed && player.position.x >= 10) {
@@ -636,9 +920,101 @@ function animate() {
   //#endregion
 
   //increment frames for update values
+  meteor_frames++
   grid_frames++
-  player_shoot_frames++;
-  enemy_shoot_frames++;
+  player_shoot_frames++
+  enemy_shoot_frames++
+  boss_shoot_frames++
+}
+
+var start = Date.now();
+var minutes = 0
+
+game_start_btn = document.getElementById('ui-start-game-btn')
+
+game_start_btn.onclick = function(){
+  console.log(api_random_num(1, 5))
+
+  bg_music.currentTime = 0
+  bg_music.play()
+
+  player = new Player()
+  player.set_defaults()
+  
+  animate();
+
+  //#region BACKGROUND PARTICLES SETUP
+  //RAINDROP
+  rain_setup();
+
+  //STARS
+  stars_setup();
+
+  //#endregion
+
+  setInterval(function() {
+    var delta = Date.now() - start; // milliseconds elapsed since start
+    seconds = parseInt(delta/1000)
+    // minutes = parseInt(seconds/60)
+    time_text.textContent = seconds
+
+    switch(minutes){
+      case 1:
+        grid_col = {min: 3, max: 6}
+        grid_row = {min: 3, max: 4}
+        grid_spawn_interval = 1200
+        enemy_shoot_interval = 500
+        meteor_spawn_interval = 500
+        if(player.current_hearts < player.max_hearts){
+          player.current_hearts++
+        }
+        break;
+      case 2:
+        grid_col = {min: 4, max: 7}
+        grid_row = {min: 3, max: 4}
+        grid_spawn_interval = 1100
+        enemy_shoot_interval = 450
+        meteor_spawn_interval = 450
+        if(player.current_hearts < player.max_hearts){
+          player.current_hearts++
+        }
+        break;
+      case 3:
+        grid_col = {min: 5, max: 8}
+        grid_row = {min: 4, max: 6}
+        grid_spawn_interval = 1000
+        enemy_shoot_interval = 400
+        meteor_spawn_interval = 400
+        if(player.current_hearts < player.max_hearts){
+          player.current_hearts++
+        }
+        break;
+      case 4:
+        grid_col = {min: 6, max: 9}
+        grid_row = {min: 5, max: 7}
+        grid_spawn_interval = 900
+        enemy_shoot_interval = 300
+        meteor_spawn_interval = 300
+        if(player.current_hearts < player.max_hearts){
+          player.current_hearts++
+        }
+        break;
+      case 5:
+        grid_spawn_interval = 0
+        enemy_shoot_interval = 0
+        meteor_spawn_interval = 200
+        if(player.current_hearts < player.max_hearts){
+          player.current_hearts++
+        }
+        //SPAWN BOSS
+        break;
+    }
+
+  }, 1000); // update about every second
+
+  document.getElementById('ui-start-game-container').style.display = "none"
+  document.getElementById('ui-div').style.visibility = "visible"
+  canvas.style.visibility = "visible"
 }
 
 //#region KEY LISTENERS
@@ -667,19 +1043,10 @@ addEventListener("keyup", ({ key }) => {
     case " ":
       keys.space.pressed = false;
       break;
+    case 'l':
+      minutes++
+      console.log(minutes)
+      break
   }
 });
-//#endregion
-
-animate();
-
-//#region BACKGROUND PARTICLES SETUP
-//RAINDROP
-rain_setup();
-
-//STARS
-stars_setup();
-
-//METEOR
-meteor_setup()
 //#endregion
