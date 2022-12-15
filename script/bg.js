@@ -127,25 +127,3 @@ class Particle{
       return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
     }
 //#endregion
-
-//#region SLOW STARS
-  function stars_setup(){
-    for(let i = 0; i < 100; i++){
-      particles.push(
-        new Particle({
-          position: {
-            x: Math.random() * canvas.width, //random
-            y: Math.random() * canvas.height, //random
-          },
-          velocity: {
-            x: 0,
-            y: 0.07
-          },
-          radius: Math.random() * 2, //random
-          color: star_colors[Math.floor(Math.random() * 3)], //random
-          fades: false
-        })
-      )
-    }
-  }
-//#endregion

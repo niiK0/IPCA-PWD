@@ -3,6 +3,7 @@ const canvas = /** @type {HTMLCanvasElement} */ (
 );
 const c = canvas.getContext("2d");
 
+//#region IMAGES
 const bg_image = new Image();
 bg_image.src = "./img/background.jpg";
 
@@ -27,7 +28,9 @@ player_image.src = "./img/player.png"
 const meteor_image = [new Image(), new Image()]
 meteor_image[0].src = "./img/meteor.png"
 meteor_image[1].src = "./img/meteor1.png"
+//#endregion
 
+//#region SOUNDS
 const shot_sound = new Audio('./sounds/Shot.mp3');
 shot_sound.volume = 0.05
 
@@ -45,11 +48,14 @@ level_up_sound.volume = 0.05
 
 const bg_music = new Audio("./sounds/BackgroundMusic.mp3")
 bg_music.volume = 0.05
+//#endregion
 
 const time_text = document.getElementById('ui-time-text')
 
 canvas.width = bg_image.width;
 canvas.height = innerHeight;
+
+let debug = true
 
 //#region CLASSES
 class Player {
@@ -74,6 +80,7 @@ class Player {
     this.max_hearts = powerups.health[powerups.health.current_level]
     this.current_hearts = this.max_hearts
     this.amount = powerups.multiple_attack[powerups.multiple_attack.current_level]
+    this.fully_upgraded = [false, false, false, false, false, false, false]
   }
 
   draw() {
@@ -89,6 +96,13 @@ class Player {
       -player.position.x - player.width / 2,
       -player.position.y - player.height / 2
     );
+
+    if(debug){
+      c.beginPath()
+      c.strokeStyle = "green",
+      c.rect(this.position.x, this.position.y, this.width, this.height)
+      c.stroke()
+    }
 
     c.drawImage(
       this.image,
@@ -131,73 +145,121 @@ class Player {
       this.player_next_exp = this.player_next_exp * 1.3
       this.player_exp = 0
     
-      let upgraded = false
-      const random_upgrade = Math.floor(Math.random() * 8)
-  
-      do{
+      let upgraded = true
+      let maxed_count = 0
+      let random_upgrade = Math.floor(Math.random() * 7)
+
+      this.fully_upgraded.forEach((powerup) =>{
+        if(!powerup){
+          upgraded = false
+        }else{
+          maxed_count++
+        }
+      })
+
+      while(!upgraded){
         switch(random_upgrade){
           case 0:
-            if(powerups.attack_speed.current_level >= powerups.attack_speed.length - 1)
+            if(powerups.attack_speed.current_level >= Object.keys(powerups.attack_speed).length - 2){
+              this.fully_upgraded[0] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.attack_speed.current_level++
               upgraded=true
             }
             break;
           case 1:
-            if(powerups.attack_pierce.current_level >= powerups.attack_pierce.length - 1)
+            if(powerups.attack_pierce.current_level >= Object.keys(powerups.attack_pierce).length - 2)
+            {
+              this.fully_upgraded[1] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.attack_pierce.current_level++
-              upgraded=true
             }
+            upgraded=true
             break;
           case 2:
-            if(powerups.bullet_speed.current_level >= powerups.bullet_speed.length - 1)
+            if(powerups.bullet_speed.current_level >= Object.keys(powerups.bullet_speed).length - 2){
+              this.fully_upgraded[2] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.bullet_speed.current_level++
-              upgraded=true
             }
+            upgraded=true
             break;
           case 3:
-            if(powerups.multiple_attack.current_level >= powerups.multiple_attack.length - 1)
+            if(powerups.multiple_attack.current_level >= Object.keys(powerups.multiple_attack).length - 2){
+              this.fully_upgraded[3] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.multiple_attack.current_level++
               this.amount = powerups.multiple_attack[powerups.multiple_attack.current_level]
-              upgraded=true
             }
+            upgraded=true
             break;
           case 4:
-            if(powerups.health.current_level >= powerups.health.length - 1)
+            if(powerups.health.current_level >= Object.keys(powerups.health).length - 2){
+              this.fully_upgraded[4] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.health.current_level++
               this.max_hearts = powerups.health[powerups.health.current_level]
               this.current_hearts++
-              upgraded=true
             }
+            upgraded=true
             break;
           case 5:
-            if(powerups.player_speed.current_level >= powerups.player_speed.length - 1)
+            if(powerups.player_speed.current_level >= Object.keys(powerups.player_speed).length - 2){
+              this.fully_upgraded[5] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.player_speed.current_level++
-              upgraded=true
             }
+            upgraded=true
             break;
           case 6:
-            if(powerups.player_size.current_level >= powerups.player_size.length - 1)
+            if(powerups.player_size.current_level >= Object.keys(powerups.player_size).length - 2){
+              this.fully_upgraded[6] = true
+              if(maxed_count >= 7)
+                upgraded = true
               break
+            }
             else{
               powerups.player_size.current_level++
-              this.scale = powerups.player_size[powerups.player_size.current_level]
-              upgraded=true
+              this.height = this.image.height * powerups.player_size[powerups.player_size.current_level];
+              this.width = this.image.width * powerups.player_size[powerups.player_size.current_level];
             }
+            upgraded=true
             break;
         }
-      }while(!upgraded)
+        maxed_count = 0
+
+        this.fully_upgraded.forEach((powerup, i) =>{
+          if(powerup){
+            maxed_count++
+          }
+        })
+
+        random_upgrade = Math.floor(Math.random() * 7)
+      }
   
       this.write_powerups()
     }, 0)
@@ -262,6 +324,13 @@ class Projectile {
   }
 
   draw() {
+    if(debug){
+      c.beginPath()
+      c.strokeStyle = "red",
+      c.rect(this.position.x, this.position.y, this.width, this.height)
+      c.stroke()
+    }
+
     c.drawImage(
       this.image,
       this.position.x,
@@ -288,6 +357,13 @@ class Meteor {
   }
 
   draw() {
+    if(debug){
+      c.beginPath()
+      c.strokeStyle = "blue",
+      c.rect(this.position.x, this.position.y, this.width, this.height)
+      c.stroke()
+    }
+
     c.drawImage(
       this.image,
       this.position.x,
@@ -314,6 +390,12 @@ class EnemyProjectile {
   }
 
   draw() {
+    if(debug){
+      c.beginPath()
+      c.strokeStyle = "red",
+      c.rect(this.position.x, this.position.y, this.width, this.height)
+      c.stroke()
+    }
     c.drawImage(
       this.image,
       this.position.x,
@@ -342,6 +424,12 @@ class Enemy {
   }
 
   draw() {
+    if(debug){
+      c.beginPath()
+      c.strokeStyle = "red",
+      c.rect(this.position.x, this.position.y, this.height, this.width)
+      c.stroke()
+    }
     c.drawImage(
       this.image,
       this.position.x,
@@ -480,10 +568,18 @@ class Grid {
     }
   }
 
-  update(){
-    this.position.x += this.velocity.x
-    this.position.y += this.position.x
+  draw(){
+    c.beginPath()
+    c.strokeStyle = "red",
+    c.rect(this.position.x, this.position.y, this.width, this.height)
+    c.stroke()
+  }
 
+  update(){
+    if(debug) this.draw()
+    this.position.x += this.velocity.x
+    this.position.y += this.velocity.y
+    
     this.velocity.y = 0
 
     if(this.position.x + this.width >= canvas.width || this.position.x <= 0){
@@ -590,8 +686,6 @@ let enemy_fake_width = 34
 let enemy_fake_height = 28
 const enemy_projectiles = [];
 
-let debug = true
-
 //BOSS VARS
 let boss_shoot_frames = 0
 let boss_shoot_interval = 100;
@@ -614,6 +708,7 @@ let meteor_spawn_interval = 600
 
 function animate() {
   requestAnimationFrame(animate);
+  if(player){
 
 //#region BACKGROUND STUFF
   //image
@@ -649,14 +744,18 @@ function animate() {
  //meteors
  meteors.forEach((meteor, i) => {
     if (meteor.position.y >= canvas.height) {
-      meteors.slice(i, 1)
+      const meteor_found = meteors.find(meteor2 => meteor2 === meteor)
+      if(meteor_found){
+        setTimeout(() => {
+          meteors.splice(i, 1);
+        }, 0);
+      }
     }
 
     if(meteor.position.y + meteor.height >= player.position.y
       && meteor.position.x + meteor.width >= player.position.x
       && meteor.position.x <= player.position.x + player.width
       ){
-      play: player_hit_sound;
       //TAKE PLAYER LIVES
       const meteor_found = meteors.find(meteor2 => meteor2 === meteor)
       if(meteor_found){
@@ -670,6 +769,7 @@ function animate() {
     }
 
     meteor.update();
+ 
   });
   
   player.update();
@@ -926,6 +1026,7 @@ function animate() {
   enemy_shoot_frames++
   boss_shoot_frames++
 }
+}
 
 var start = Date.now();
 var minutes = 0
@@ -933,7 +1034,7 @@ var minutes = 0
 game_start_btn = document.getElementById('ui-start-game-btn')
 
 game_start_btn.onclick = function(){
-  console.log(api_random_num(1, 5))
+  // console.log(api_random_num(1, 5))
 
   bg_music.currentTime = 0
   bg_music.play()
@@ -947,15 +1048,12 @@ game_start_btn.onclick = function(){
   //RAINDROP
   rain_setup();
 
-  //STARS
-  stars_setup();
-
   //#endregion
 
   setInterval(function() {
     var delta = Date.now() - start; // milliseconds elapsed since start
     seconds = parseInt(delta/1000)
-    // minutes = parseInt(seconds/60)
+    minutes = parseInt(seconds/60)
     time_text.textContent = seconds
 
     switch(minutes){
