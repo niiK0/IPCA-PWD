@@ -724,23 +724,6 @@ function animate() {
   score_text = document.getElementById('ui-score-text')
   score_text.textContent = score
   
-  //slow particles
-  particles.forEach((particle, i) => {
-    if (particle.position.y - particle.radius >= canvas.height) {
-      particle.position.x = Math.random() * canvas.width; //random
-      particle.position.y = -particle.radius;
-    }
-    
-    if (particle.opacity <= 0) {
-      setTimeout(() => {
-        particles.splice(i, 1);
-      }, 0);
-    } else {
-      particle.update();
-    }
-  });
-  //#endregion
-  
  //meteors
  meteors.forEach((meteor, i) => {
     if (meteor.position.y >= canvas.height) {
@@ -1034,7 +1017,6 @@ var minutes = 0
 game_start_btn = document.getElementById('ui-start-game-btn')
 
 game_start_btn.onclick = function(){
-  // console.log(api_random_num(1, 5))
 
   bg_music.currentTime = 0
   bg_music.play()
@@ -1050,14 +1032,12 @@ game_start_btn.onclick = function(){
 
   //#endregion
 
-  casex = 0
-
   setInterval(function() {
     var delta = Date.now() - start; // milliseconds elapsed since start
     seconds = parseInt(delta/1000)
     minutes = parseInt(seconds/60)
     time_text.textContent = seconds
-    
+
     switch(minutes){
       case 1:
         grid_col = {min: 3, max: 6}
@@ -1065,9 +1045,8 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1200
         enemy_shoot_interval = 500
         meteor_spawn_interval = 500
-        if(casex === 0 && player.current_hearts < player.max_hearts){
+        if(player.current_hearts < player.max_hearts){
           player.current_hearts++
-          casex++
         }
         break;
       case 2:
@@ -1076,9 +1055,8 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1100
         enemy_shoot_interval = 450
         meteor_spawn_interval = 450
-        if(casex === 1 && player.current_hearts < player.max_hearts){
+        if(player.current_hearts < player.max_hearts){
           player.current_hearts++
-          casex++
         }
         break;
       case 3:
@@ -1087,9 +1065,8 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1000
         enemy_shoot_interval = 400
         meteor_spawn_interval = 400
-        if(casex === 2 && player.current_hearts < player.max_hearts){
+        if(player.current_hearts < player.max_hearts){
           player.current_hearts++
-          casex++
         }
         break;
       case 4:
@@ -1098,24 +1075,22 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 900
         enemy_shoot_interval = 300
         meteor_spawn_interval = 300
-        if(casex === 3 && player.current_hearts < player.max_hearts){
+        if(player.current_hearts < player.max_hearts){
           player.current_hearts++
-          casex++
         }
         break;
       case 5:
         grid_spawn_interval = 0
         enemy_shoot_interval = 0
         meteor_spawn_interval = 200
-        if(casex === 4 && player.current_hearts < player.max_hearts){
+        if(player.current_hearts < player.max_hearts){
           player.current_hearts++
-          casex++
         }
         //SPAWN BOSS
         break;
     }
 
-  }, 1000); // update about every second
+  }, 300); // update about every second
 
   document.getElementById('ui-start-game-container').style.display = "none"
   document.getElementById('ui-div').style.visibility = "visible"

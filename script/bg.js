@@ -1,83 +1,58 @@
 let drops = []
 let particles = []
 
-const star_colors = ['white', 'yellow', 'orange']
+let star_colors = []
+$(document).ready(function() {
+  api_get_weather()
+});
+
 
 //#region ParticleJS
-particlesJS("particles-js", {
-  particles: {
-    number: { value: 100, density: { enable: false, value_area: 500 } },
-    shape: {type: "star"}, //cirlce maybe?
-    color: { value: ["#fff", "#FFA500", "#FFFF00"] },
-    opacity: {
-      value: 1,
-      random: true,
-      anim: { enable: true, speed: 0.5, opacity_min: 0, sync: false }
+setTimeout(()=>{
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 100, density: { enable: false, value_area: 500 } },
+      shape: {type: "star"}, //cirlce maybe?
+      color: { value: ["#fff", star_colors[0], star_colors[1]] },
+      opacity: {
+        value: 1,
+        random: true,
+        anim: { enable: true, speed: 0.5, opacity_min: 0, sync: false }
+      },
+      size: {
+        value: 2,
+        random: true
+      },
+      line_linked: {
+        enable: false,
+        color: star_colors[0]
+      },
+      move: {
+        enable: true,
+        speed: 0.15,
+        direction: "bottom",
+        random: false,
+        straight: true,
+        out_mode: "out",
+        bounce: false,
+        // attract: { enable: false, rotateX: 600, rotateY: 600 }
+      }
     },
-    size: {
-      value: 2,
-      random: true
+    interactivity: {
+      detect_on: "canvas",
+      events: {
+        onhover: { enable: true, mode: "grab" },
+        onclick: { enable: false},
+        resize: false
+      },
+      modes: {
+        grab: { distance: 100, line_linked: { opacity: 0.4} },
+      }
     },
-    line_linked: {
-      enable: false,
-      color: "#FFA500"
-    },
-    move: {
-      enable: true,
-      speed: 0.15,
-      direction: "bottom",
-      random: false,
-      straight: true,
-      out_mode: "out",
-      bounce: false,
-      // attract: { enable: false, rotateX: 600, rotateY: 600 }
-    }
-  },
-  interactivity: {
-    detect_on: "canvas",
-    events: {
-      onhover: { enable: true, mode: "grab" },
-      onclick: { enable: false},
-      resize: false
-    },
-    modes: {
-      grab: { distance: 100, line_linked: { opacity: 0.4} },
-    }
-  },
-  retina_detect: true
-});
+    retina_detect: true
+  });
+}, 500)
 //#endregion
-
-class Particle{
-  constructor({position, velocity, radius, color, fades}){
-    this.position = position
-    this.velocity = velocity
-
-    this.radius = radius
-    this.color = color
-    this.opacity = 1
-    this.fades = fades
-  }
-
-  draw(){
-    c.beginPath()
-    c.globalAlpha = this.opacity
-    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-    c.fillStyle = this.color
-    c.fill()
-    c.closePath()
-    c.restore()
-  }
-
-  update(){
-    this.draw()
-    this.position.x += this.velocity.x
-    this.position.y += this.velocity.y
-    
-    if(this.fades)
-      this.opacity -= 0.01
-  }
-}
 
 //#region RAIN
   function rain_setup() {
