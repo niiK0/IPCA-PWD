@@ -1032,6 +1032,8 @@ game_start_btn.onclick = function(){
 
   //#endregion
 
+  let casex = 0
+
   setInterval(function() {
     var delta = Date.now() - start; // milliseconds elapsed since start
     seconds = parseInt(delta/1000)
@@ -1045,8 +1047,9 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1200
         enemy_shoot_interval = 500
         meteor_spawn_interval = 500
-        if(player.current_hearts < player.max_hearts){
+        if(casex === 4 && player.current_hearts < player.max_hearts){
           player.current_hearts++
+          casex++
         }
         break;
       case 2:
@@ -1055,8 +1058,9 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1100
         enemy_shoot_interval = 450
         meteor_spawn_interval = 450
-        if(player.current_hearts < player.max_hearts){
+        if(casex === 4 && player.current_hearts < player.max_hearts){
           player.current_hearts++
+          casex++
         }
         break;
       case 3:
@@ -1065,8 +1069,9 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1000
         enemy_shoot_interval = 400
         meteor_spawn_interval = 400
-        if(player.current_hearts < player.max_hearts){
+        if(casex === 4 && player.current_hearts < player.max_hearts){
           player.current_hearts++
+          casex++
         }
         break;
       case 4:
@@ -1075,16 +1080,18 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 900
         enemy_shoot_interval = 300
         meteor_spawn_interval = 300
-        if(player.current_hearts < player.max_hearts){
+        if(casex === 4 && player.current_hearts < player.max_hearts){
           player.current_hearts++
+          casex++
         }
         break;
       case 5:
         grid_spawn_interval = 0
         enemy_shoot_interval = 0
         meteor_spawn_interval = 200
-        if(player.current_hearts < player.max_hearts){
+        if(casex === 4 && player.current_hearts < player.max_hearts){
           player.current_hearts++
+          casex++
         }
         //SPAWN BOSS
         break;
