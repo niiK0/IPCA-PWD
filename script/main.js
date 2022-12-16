@@ -1047,7 +1047,7 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1200
         enemy_shoot_interval = 500
         meteor_spawn_interval = 500
-        if(casex === 4 && player.current_hearts < player.max_hearts){
+        if(casex === 0 && player.current_hearts < player.max_hearts){
           player.current_hearts++
           casex++
         }
@@ -1058,7 +1058,7 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1100
         enemy_shoot_interval = 450
         meteor_spawn_interval = 450
-        if(casex === 4 && player.current_hearts < player.max_hearts){
+        if(casex === 1 && player.current_hearts < player.max_hearts){
           player.current_hearts++
           casex++
         }
@@ -1069,7 +1069,7 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 1000
         enemy_shoot_interval = 400
         meteor_spawn_interval = 400
-        if(casex === 4 && player.current_hearts < player.max_hearts){
+        if(casex === 2 && player.current_hearts < player.max_hearts){
           player.current_hearts++
           casex++
         }
@@ -1080,7 +1080,7 @@ game_start_btn.onclick = function(){
         grid_spawn_interval = 900
         enemy_shoot_interval = 300
         meteor_spawn_interval = 300
-        if(casex === 4 && player.current_hearts < player.max_hearts){
+        if(casex === 3 && player.current_hearts < player.max_hearts){
           player.current_hearts++
           casex++
         }
